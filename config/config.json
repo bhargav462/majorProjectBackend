@@ -1,0 +1,11 @@
+{
+    "production":{
+      "MONGODB_URI" : "",
+      "JWT_SECRET" : "jkchasjdhja"
+   },
+    "development":{ 
+        "MONGODB_URI" : "",
+        "JWT_SECRET" : "jkchasjdhja",
+        "PORT" : 3001
+    } 
+  }
