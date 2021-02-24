@@ -1,97 +1,35 @@
 const express = require('express');
+const dotenv = require('dotenv');
+const connectDB = require('./config/db');
+const morgan = require('morgan');
 const cors = require('cors');
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 
-const passport = require('passport');
-const FacebookStrategy = require('passport-facebook');
-const GoogleStrategy = require('passport-google-oauth20');
-const InstagramStrategy = require('passport-instagram');
+dotenv.config({path:'./config/config.env'})
 
-const config = require('./config/config')
-const PassportKeys = require('./config/passport_keys')
+const PORT = process.env.PORT || 5000;
 
-const PORT = process.env.PORT;
+connectDB();
 
 const app = express();
+
 app.use(cors());
+app.use(cookieParser());
 
-passport.serializeUser((user,cb) => {
-    cb(null,user);
-})
+if(process.env.NODE_ENV === 'development'){
+    app.use(morgan('dev'));
+}
 
-passport.deserializeUser((user,cb) => {
-    cb(null,user);
-})
-
-//Facebook Strategy
-passport.use(new FacebookStrategy({
-   clientID: PassportKeys.FACEBOOK.clientID,
-   clinetSecret: PassportKeys.FACEBOOK.clientSecret,
-   callbackURL: "/auth/facebook/callback"
-  },
-  (accessToken,refreshToken,profile,cb) => {
-      console.log('profile',profile)
-      return AbortController(null,profile);
-  }
-))
-
-// Google Strategy
-passport.use(new GoogleStrategy({
-    clientID: PassportKeys.GOOGLE.clientID,
-    clientSecret: PassportKeys.GOOGLE.clientSecret,
-    callbackURL: "/auth/google/callback"
-},
-(accessToken, refreshToken, profile, cb) => {
-    console.log(chalk.blue(JSON.stringify(profile)));
-    user = { ...profile };
-    return cb(null, profile);
-}));
-
-// Instagram Strategy
-passport.use(new InstagramStrategy({
-    clientID: PassportKeys.INSTAGRAM.clientID,
-    clientSecret: PassportKeys.INSTAGRAM.clientSecret,
-    callbackURL: "/auth/instagram/callback"
-},
-(accessToken, refreshToken, profile, cb) => {
-    console.log(chalk.blue(JSON.stringify(profile)));
-    user = { ...profile };
-    return cb(null, profile);
-}));
-
-app.use(passport.initialize());
-
-app.get("/auth/facebook", passport.authenticate("facebook"));
-
-app.get("/auth/facebook/callback",
-        passport.authenticate("facebook"),
-        (req, res) => {
-    res.redirect("/profile");
-});
-
-app.get("/auth/google", passport.authenticate("google", {
-    scope: ["profile", "email"]
-}));
-
-app.get("/auth/google/callback",
-    passport.authenticate("google"),
-        (req, res) => {
-            console.log('in')
-            res.send("done")
-        });
-
-app.get("/auth/instagram", passport.authenticate("instagram"));
-
-app.get("/auth/instagram/callback",
-    passport.authenticate("instagram"),
-        (req, res) => {
-            res.redirect("/profile");
-        });
+app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.json());
+app.use(require('./routes/UserRoutes'))
 
 app.get('/',(req,res) => {
     console.log('deployed successfully')
-    res.send('deployed successfully')
+    res.send('<h1>You can get / route</h1>')
 })
 
 app.listen(PORT,() => {
-    console.log(`Server is up on port ${PORT}`);
+    console.log(`Server running in ${process.env.NODE_ENV} made on port ${PORT}`);
 })
