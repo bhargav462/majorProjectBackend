@@ -30,6 +30,9 @@ app.get('/',(req,res) => {
     res.send('<h1>You can get / route</h1>')
 })
 
+require('./models/product')
+app.use('/products', require('./routes/product'))
+
 app.listen(PORT,() => {
     console.log(`Server running in ${process.env.NODE_ENV} made on port ${PORT}`);
 })
