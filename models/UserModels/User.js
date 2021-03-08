@@ -18,6 +18,18 @@ let UserSchema = new Schema({
         type: Number,
         unique: true
     },
+    houseNo: {
+        type: String
+    },
+    landmark: {
+        type: String
+    },
+    district: {
+        type: String
+    },
+    state: {
+        type: String
+    },
     password:{
         type:String,
         required:true
