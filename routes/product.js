@@ -8,19 +8,19 @@ app.get('/', async (req,res) => {
     res.json(products);
 })
 
-app.get('/insert/:crop/:location/:price/:amount/:description', async (req,res) => {
+app.post('/farmer/addCrop', async (req,res) => {
     await new Products({
-        crop: req.params.crop,
-        location: req.params.location,
-        price: req.params.price,
-        amount: req.params.amount,
-        description: req.params.description
+        crop: req.body.crop,
+        location: req.body.address,
+        price: req.body.price,
+        amount: req.body.amount,
+        description: req.body.description
     }).save((err,data) => {
         if(err) {
             res.json(err)
         }
         else{
-            res.redirect('/products')
+            res.send({added:true})
         }
     })
 })

@@ -4,7 +4,7 @@ const productSchema = new mongoose.Schema({
     crop: {
         type: String
     },
-    location: {
+    address: {
         type: String
     },
     price: {
