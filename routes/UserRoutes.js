@@ -116,6 +116,9 @@ router.post('/auth/login',async (req,res) => {
 })
 
 router.post('/SMS/register',async(req,res) => {
+
+    console.log("/SMS/register")
+
     var msg = req.body.msg;
     var index = msg.lastIndexOf(" ");
     var name = msg.substring(0,index);
@@ -127,12 +130,12 @@ router.post('/SMS/register',async(req,res) => {
         user.Name = name;
         user.mobile = mobile;
 
+        console.log()
+
         await user.save();
 
         res.send({added: true});
-    }
-
-    else {
+    }else {
         console.log("mobile no. is not correct. Send message in proper format");
         res.send({error: "mobile no. is not correct. Send message in proper format"})
     }
