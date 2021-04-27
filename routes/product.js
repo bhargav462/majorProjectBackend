@@ -4,10 +4,16 @@ const mongoose = require('mongoose')
 const Products = mongoose.model("products");
 
 const multer = require('multer');
-const upload = multer({
-    limits:{
-        fileSize: 400000000
+var storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/uploads')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + '-' + Date.now())
     }
+});
+const upload = multer({
+    storage: storage
 })
 
 app.get('/', async (req,res) => {
@@ -29,7 +35,8 @@ app.post('/farmer/addCrop', upload.array('images'),async (req,res) => {
         address: req.body.address,
         price: req.body.price,
         amount: req.body.weight,
-        description: req.body.description
+        description: req.body.description,
+        images : req.files.images
     }).save((err,data) => {
         if(err) {
             res.json(err)
