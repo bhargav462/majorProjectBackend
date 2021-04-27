@@ -16,7 +16,9 @@ const productSchema = new mongoose.Schema({
     description: {
         type: String
     },
-    images:[Buffer]
+    images:[{
+        type: Buffer
+    }]
 });
 
 module.exports = mongoose.model('products', productSchema);
