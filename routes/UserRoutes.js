@@ -117,7 +117,7 @@ router.post('/auth/login',async (req,res) => {
 
 router.post('/SMS/register',async(req,res) => {
 
-    console.log("/SMS/register")
+    console.log("/SMS/register",req.body)
 
     var msg = req.body.msg;
     var index = msg.lastIndexOf(" ");
