@@ -21,13 +21,19 @@ app.post('/farmer/addCrop', upload.array('images'),async (req,res) => {
         console.log("data",data);
     });
 
+    let images = req.files.filter(images => {
+        return images.buffer;
+    })
+
+    console.log("images",images)
+
     await new Products({
         crop: req.body.cropName,
         address: req.body.address,
         price: req.body.price,
         amount: req.body.weight,
         description: req.body.description,
-        images : req.files.images
+        images : images
     }).save((err,data) => {
         if(err) {
             res.json(err)
