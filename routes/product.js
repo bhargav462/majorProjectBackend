@@ -3,17 +3,32 @@ const app = express()
 const mongoose = require('mongoose')
 const Products = mongoose.model("products");
 
+const multer = require('multer');
+const upload = multer({
+    limits:{
+        fileSize: 400000000
+    }
+})
+
 app.get('/', async (req,res) => {
     const products = await Products.find();
     res.json(products);
 })
 
-app.post('/farmer/addCrop', async (req,res) => {
+app.post('/farmer/addCrop', upload.array('images'),async (req,res) => {
+    
+    console.log("body",req.body)
+    console.log(req.files)
+
+    req.on('data', (data) => {
+        console.log("data",data);
+    });
+
     await new Products({
-        crop: req.body.crop,
-        location: req.body.address,
+        crop: req.body.cropName,
+        address: req.body.address,
         price: req.body.price,
-        amount: req.body.amount,
+        amount: req.body.weight,
         description: req.body.description
     }).save((err,data) => {
         if(err) {
