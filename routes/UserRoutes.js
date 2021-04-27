@@ -1,6 +1,7 @@
 const express = require('express');
 const GoogleUser = require('./../models/UserModels/GoogleUser')
 const User = require('./../models/UserModels/User')
+const SMSUser = require('./../models/UserModels/SMSUser')
 const router = express.Router();
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
@@ -111,6 +112,31 @@ router.post('/auth/login',async (req,res) => {
         console.log("/auth/login - error",e);
         res.status(400).send({error: "Unexpected error has occured"})
     }
+
+})
+
+router.post('/SMS/register',async(req,res) => {
+    var msg = req.body.msg;
+    var index = msg.lastIndexOf(" ");
+    var name = msg.substring(0,index);
+    var mobile = msg.substring(index+1,msg.length)
+    var phoneno = /^\d{10}$/;
+
+    if(mobile.match(phoneno)) {
+        let user = new SMSUser();
+        user.Name = name;
+        user.mobile = mobile;
+
+        await user.save();
+
+        res.send({added: true});
+    }
+
+    else {
+        console.log("mobile no. is not correct. Send message in proper format");
+        res.send({error: "mobile no. is not correct. Send message in proper format"})
+    }
+    
 
 })
 
