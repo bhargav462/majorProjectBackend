@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 const Products = mongoose.model("products");
+const sharp = require('sharp');
 
 const multer = require('multer');
 
