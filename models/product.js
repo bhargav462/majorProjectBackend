@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
+const ObjectID = mongoose.ObjectID
 
 const productSchema = new mongoose.Schema({
+    farmerId:{
+        type: ObjectID
+    },
     crop: {
         type: String
     },

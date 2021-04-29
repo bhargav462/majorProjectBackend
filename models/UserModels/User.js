@@ -3,10 +3,15 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserToken = require('./../UserToken')
+const userTypes = require('./../../Utils/UserTypes')
 
 let UserSchema = new Schema({
     name:{
         type:String
+    },
+    type:{
+        type: String,
+        default: userTypes.BUYER
     },
     email:{
         type:String,

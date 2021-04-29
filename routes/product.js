@@ -3,6 +3,7 @@ const app = express()
 const mongoose = require('mongoose')
 const Products = mongoose.model("products");
 const sharp = require('sharp');
+const auth = require('./../middleware/auth')
 
 const multer = require('multer');
 
@@ -13,9 +14,10 @@ app.get('/', async (req,res) => {
     res.json(products);
 })
 
-app.post('/farmer/addCrop', upload.array('images'),async (req,res) => {
+app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
     
     console.log("body",req.body)
+    console.log("user",req.user)
     console.log(req.files)
 
     req.on('data', (data) => {
