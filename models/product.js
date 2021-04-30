@@ -3,7 +3,7 @@ const ObjectID = mongoose.ObjectID
 
 const productSchema = new mongoose.Schema({
     farmerId:{
-        type: ObjectID
+        type: String
     },
     crop: {
         type: String

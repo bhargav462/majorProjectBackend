@@ -33,6 +33,8 @@ app.get('/',(req,res) => {
 require('./models/product')
 app.use('/products', require('./routes/product'))
 
+app.use(require('./routes/profile'))
+
 app.listen(PORT,() => {
     console.log(`Server running in ${process.env.NODE_ENV} made on port ${PORT}`);
 })

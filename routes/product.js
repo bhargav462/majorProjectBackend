@@ -6,6 +6,7 @@ const sharp = require('sharp');
 const auth = require('./../middleware/auth')
 
 const multer = require('multer');
+const { FARMER, BUYER } = require('../Utils/UserTypes');
 
 const upload = multer();
 
@@ -14,8 +15,19 @@ app.get('/', async (req,res) => {
     res.json(products);
 })
 
+app.get('/:cropName',async(req,res) => {
+    const products = await Products.find({crop:req.params.cropName});
+    res.json(products);
+})
+
 app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
-    
+
+    if(req.user.type != BUYER)
+    {
+        res.json({error: 'Only farmer can add a crop'})
+    }
+    else {
+
     console.log("body",req.body)
     console.log("user",req.user)
     console.log(req.files)
@@ -31,6 +43,7 @@ app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
     console.log("images",images)
 
     await new Products({
+        farmerId: req.user.id,
         crop: req.body.cropName,
         address: req.body.address,
         price: req.body.price,
@@ -45,6 +58,8 @@ app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
             res.send({added:true})
         }
     })
+
+}
 })
 
 app.get('/update/:id/:crop/:location/:price/:amount/:description', async(req,res) => {
