@@ -7,12 +7,17 @@ const { BUYER, FARMER } = require('../Utils/UserTypes');
 
 router.get('/profile',auth, async (req,res) => {
     const profile = await User.findOne({_id:req.user.id});
-    res.json(profile);
+    const profileAndProducts = {
+        profile: profile,
+        products: null
+    }
     if(req.user.type == FARMER)
     {
         const products = await Products.find({farmerId:req.user.id}).toArray();
-        res.json(products);
+        profileAndProducts.products = products
     }
+
+    res.send(profileAndProducts)
     
 })
 

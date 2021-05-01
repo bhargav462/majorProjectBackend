@@ -10,12 +10,12 @@ const { FARMER, BUYER } = require('../Utils/UserTypes');
 
 const upload = multer();
 
-app.get('/', async (req,res) => {
+app.get('/crops', async (req,res) => {
     const products = await Products.find();
     res.json(products);
 })
 
-app.get('/:cropName',async(req,res) => {
+app.get('/:cropName',auth,async(req,res) => {
     const products = await Products.find({crop:req.params.cropName});
     res.json(products);
 })

@@ -5,12 +5,13 @@ const SMSUser = require('./../models/UserModels/SMSUser')
 const router = express.Router();
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
+const userTypes = require('./../Utils/UserTypes')
 
 router.post('/google/register',async (req,res) => {
-    console.log("register")
+    console.log("register",req.body)
     try{
 
-        const googleuser = await GoogleUser.findOne({email : req.body.email})
+        const googleuser = await GoogleUser.findOne({email : req.body.email,type: req.body.type})
 
         if(googleuser){
             const token = await googleuser.generateAuthToken();
@@ -22,6 +23,11 @@ router.post('/google/register',async (req,res) => {
         user.Name = req.body.name;
         user.email = req.body.email;
         user.image = req.body.image;
+
+        if(req.body.type === userTypes.FARMER)
+        {
+            user.type = userTypes.FARMER
+        }
     
         await user.save();
         const token = await user.generateAuthToken();
@@ -66,6 +72,10 @@ router.post('/auth/register',async (req,res) => {
         let user = _.pick(req.body,['email','name','phoneNo','password']);
         console.log("user",user);
         let newUser = new User(user);
+        if(req.body.type === userTypes.FARMER)
+        {
+            newUser.type = userTypes.FARMER
+        }
         await newUser.save();
         const token = await newUser.generateAuthToken();
         res.send({token});

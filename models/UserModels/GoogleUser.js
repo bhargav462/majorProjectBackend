@@ -3,8 +3,13 @@ const Schema = mongoose.Schema;
 const jwt = require('jsonwebtoken')
 const UserToken = require('../UserToken')
 const loginType = require('./../../config/loginTypes')
+const userTypes = require('./../../Utils/UserTypes')
 
 const GoogleUserSchema = new Schema({
+    type:{
+        type: String,
+        default: userTypes.BUYER
+    },
     googleId: {
         type: String
     },
