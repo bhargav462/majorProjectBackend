@@ -30,7 +30,7 @@ const auth = async(req,res,next) => {
         next();
     }catch(err){
         console.log('error',err.name);
-        res.status(403).send({error:LOGIN});
+        res.status(401).send({error:LOGIN});
     }
 }
 
