@@ -36,9 +36,14 @@ app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
         console.log("data",data);
     });
 
+    sharp(images)
+    .resize(200,200);
+
     let images = req.files.filter(images => {
         return images.buffer;
     })
+
+    // console.log("width",images.width)
 
     console.log("images",images)
 
