@@ -3,25 +3,35 @@ const ObjectID = mongoose.ObjectID
 
 const productSchema = new mongoose.Schema({
     farmerId:{
-        type: String
+        type: String,
+        required: true
     },
     crop: {
-        type: String
+        type: String,
+        required: true
     },
     address: {
-        type: String
+        type: String,
+        required: true
+    },
+    pincode:{
+        type: Number,
+        required: true
     },
     price: {
-        type: Number
+        type: Number,
+        required: true
     },
     amount: {
-        type: Number
+        type: Number,
+        required: true
     },
     description: {
-        type: String
+        type: String,
+        required: true
     },
     images:[{
-        type: Object
+        type: Object    
     }]
 });
 

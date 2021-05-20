@@ -20,19 +20,12 @@ let UserSchema = new Schema({
         match:/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     },
     phoneNo: {
-        type: Number,
-        unique: true
+        type: Number
     },
-    houseNo: {
+    address: {
         type: String
     },
-    landmark: {
-        type: String
-    },
-    district: {
-        type: String
-    },
-    state: {
+    pincode: {
         type: String
     },
     password:{

@@ -13,9 +13,8 @@ const GoogleUserSchema = new Schema({
     googleId: {
         type: String
     },
-    Name: {
-        type: String,
-        required: true
+    name: {
+        type: String
     },
     email: {
         type:String,
@@ -23,6 +22,15 @@ const GoogleUserSchema = new Schema({
         match:/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     },
     image: {
+        type: String
+    },
+    phoneNo: {
+        type: Number
+    },
+    address: {
+        type: String
+    },
+    pincode: {
         type: String
     },
     createdAt: {
@@ -37,7 +45,7 @@ GoogleUserSchema.methods.generateAuthToken = async function(){
     const token = jwt.sign({_id:user._id.toString()},process.env.JWT_SECRET,{expiresIn:24*60*60*1000})
 
     const userToken = new UserToken();
-    userToken.tokens = userToken.tokens.concat({token})
+    userToken.token = token
     userToken.userId = user._id;
     userToken.loginType = loginType.GOOGLE;
     await userToken.save();

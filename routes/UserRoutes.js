@@ -11,6 +11,10 @@ router.post('/google/register',async (req,res) => {
     console.log("register",req.body)
     try{
 
+        const Nuser = await User.findOne({email: req.body.email})
+        if(Nuser !== null)
+           return res.send({error: 'Already Registered'})
+
         const googleuser = await GoogleUser.findOne({email : req.body.email,type: req.body.type})
 
         if(googleuser){
@@ -43,7 +47,11 @@ router.post('/google/login',async (req,res) => {
     console.log("login")
     try{
 
-        const googleuser = await GoogleUser.findOne({email : req.body.email})
+        const Nuser = await User.findOne({email: req.body.email})
+        if(Nuser !== null)
+           return res.send({error: 'Already Registered'})
+
+        const googleuser = await GoogleUser.findOne({email : req.body.email,type: req.body.type})
 
         if(googleuser){
             const token = await googleuser.generateAuthToken();
@@ -55,20 +63,29 @@ router.post('/google/login',async (req,res) => {
         user.Name = req.body.name;
         user.email = req.body.email;
         user.image = req.body.image;
+
+        if(req.body.type === userTypes.FARMER)
+        {
+            user.type = userTypes.FARMER
+        }
     
         await user.save();
         const token = await user.generateAuthToken();
         res.send({token})
     }catch(e){
         console.log('/google/login - error',e)
-        res.status(401).send({error: "Unable to register"})
+        res.send({error: "Unable to register"})
     }
 
 })
 
 router.post('/auth/register',async (req,res) => {
-
+    console.log(req.body)
     try{
+        const googleUser = await GoogleUser.findOne({email: req.body.email})
+        console.log('gUser',googleUser)
+        if(googleUser !== null)
+           return res.send({error: 'Already Registered'})
         let user = _.pick(req.body,['email','name','phoneNo','password']);
         console.log("user",user);
         let newUser = new User(user);
@@ -92,7 +109,7 @@ router.post('/auth/register',async (req,res) => {
                 return res.status(403).send({error:"phoneNo"})
             }
 
-            return res.status(403).send({error:"Unexpected error has occured"})
+            return res.status(403).send({error:"Invalid Credentials or Unexpected error has occured"})
         }catch(e){
             console.log("/auth/register - error",e);
             return res.status(403).send({error:"Unexpected error has occured"})
@@ -103,8 +120,10 @@ router.post('/auth/register',async (req,res) => {
 
 router.post('/auth/login',async (req,res) => {
 
+    console.log("body",req.body);
+
     try{
-        const user = await User.findOne({email: req.body.email});
+        const user = await User.findOne({email: req.body.email,type: req.body.type});
         
         if(!user){
             return res.status(400).send();

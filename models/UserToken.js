@@ -8,11 +8,10 @@ const userTokenSchema = new Schema({
       type: ObjectId,
       required: true
    },
-   tokens:[{
-      token:{
-          type:String      
-      }
-   }],
+   token:{
+      type: String,
+      required: true
+   },
    loginType: {
       type: String,
       default: loginTypes.NORMAL

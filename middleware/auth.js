@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/UserModels/GoogleUser');
+const GoogleUser = require('../models/UserModels/GoogleUser');
+const User = require('./../models/UserModels/User')
 const UserToken = require('../models/UserToken')
 
-const LOGIN = "Login"
+const LOGIN = "Please Login"
 
 const auth = async(req,res,next) => {
     try{
@@ -17,16 +18,22 @@ const auth = async(req,res,next) => {
         }
 
         const user = await User.findOne({_id:decoded._id})
+        const googleUser = await GoogleUser.findOne({_id:decoded._id})
         console.log('user',user);
-        if(!user){
+        console.log('user bool',(!user))
+        if((user !== null) && (googleUser !== null)){
             console.log('Login');
             return res.status(403).send({error:LOGIN});
         }
 
-        console.log('authentication was done succesfully');
-
-        req.user = user;
+        if(user !== null){
+            req.user = user;
+        }else{
+            req.user = googleUser;
+        }
         req.token = token;
+        console.log('authentication was done succesfully');
+        
         next();
     }catch(err){
         console.log('error',err.name);

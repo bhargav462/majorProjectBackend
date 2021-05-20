@@ -2,16 +2,20 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 const Products = mongoose.model("products");
+const User = require('./../models/UserModels/User')
+const GoogleUser = require('./../models/UserModels/GoogleUser')
 const sharp = require('sharp');
 const auth = require('./../middleware/auth')
 
 const multer = require('multer');
 const { FARMER, BUYER } = require('../Utils/UserTypes');
+const product = require('../models/product');
 
 const upload = multer();
 
-app.get('/crops', async (req,res) => {
+app.post('/crops', async (req,res) => {
     const products = await Products.find();
+    console.log('all crops',products)
     res.json(products);
 })
 
@@ -20,11 +24,46 @@ app.get('/:cropName',auth,async(req,res) => {
     res.json(products);
 })
 
+app.post('/getCrop/id',async (req,res) => {
+    console.log(req.body)
+    try{
+        const product = await Products.findById(req.body.id)
+        if(product)
+        res.send(product)
+        else
+        res.send({error:"Invalid Crop ID"})
+    }catch(e){
+        console.log("/getCrop/id ",e);
+        res.send({error:"Invalid Crop ID"})
+    }
+})
+
+app.post('/id',async(req,res) => {
+    console.log(req.body)
+    const product = await Products.findById(req.body.id);
+    let farmer;
+    if(product)
+    {
+        const user = await User.findById(product.farmerId)
+        if(user){
+           farmer = user
+        }else{
+            const googleUser = await GoogleUser.findById(product.farmerId)
+            farmer = googleUser
+        }
+    }
+    console.log("farner",farmer)
+    res.send({
+        crop:product,
+        farmer
+    }); 
+})
+
 app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
 
-    if(req.user.type != BUYER)
+    if(req.user.type != FARMER)
     {
-        res.json({error: 'Only farmer can add a crop'})
+        return res.json({error: 'Only farmer can add a crop'})
     }
     else {
 
@@ -32,15 +71,14 @@ app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
     console.log("user",req.user)
     console.log(req.files)
 
-    req.on('data', (data) => {
-        console.log("data",data);
-    });
-
     let images = req.files.filter(images => {
         return images.buffer;
     })
 
     console.log("images",images)
+
+    if(images.length === 0)
+    return res.send({error:"images are required"})
 
     await new Products({
         farmerId: req.user.id,
@@ -49,47 +87,85 @@ app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
         price: req.body.price,
         amount: req.body.weight,
         description: req.body.description,
+        pincode: req.body.pincode,
         images : images
     }).save((err,data) => {
         if(err) {
-            res.json(err)
+            console.log("err -- /products/addCrop",err)
+            res.send({error:err})
         }
-        else{
-            res.send({added:true})
+        else{   
+            res.send({id:data._id})
         }
     })
 
 }
 })
 
-app.get('/update/:id/:crop/:location/:price/:amount/:description', async(req,res) => {
-    await Products.updateOne({_id:req.params.id}, { 
-        
-        crop: req.params.crop,
-        location: req.params.location,
-        price: req.params.price,
-        amount: req.params.amount,
-        description: req.params.description
+app.post('/farmer/updateCrop',auth,async(req,res) => {
 
-    }, (err,data)=> {
-        if(err) {
-            res.json(err)
+    console.log('update Crop',req.body)
+
+    try{
+        const product = await Products.findOne({_id: req.body.id,farmerId:req.user._id})
+       
+        if(!product){
+            return res.send({error: "You are not the owner of this crop"})
         }
-        else{
-            res.redirect('/products')
-        }
-    })
+
+        product.crop = req.body.crop
+        product.location = req.body.address
+        product.price = req.body.price
+        product.amount = req.body.amount
+        product.description = req.body.description
+        product.pincode = req.body.pincode
+
+        await product.save()
+        res.send({added: true})
+    }catch(e){
+        console.log("error",e)
+        res.send({error:e})
+    }
+
 })
 
-app.get('/delete/:id', async (req,res) => {
-    await Products.deleteOne({_id:req.params.id}, (err,_data) => {
-        if(err){
-            res.json(err)
+app.post('/farmer/deleteCrop',auth, async (req,res) => {
+    try{
+        const product = await Products.deleteOne({_id: req.body.id,farmerId:req.user._id})
+        console.log("product",product)
+        if(product.deletedCount === 0){
+            res.send({error: "You are not the owner of this crop"})
+        }else{
+            res.send({deleted:true})
         }
-        else{
-            res.redirect('/products')
+    }catch(e){
+        console.log(e)
+        res.send({error:e})
+    }
+})
+
+app.post('/filter',async (req,res) => {
+    const {filter} = req.body
+    try{
+        if(filter.crop && filter.pincode){
+            console.log("crop and pincode")
+            const products = await Products.find({crop: filter.crop, pincode: filter.pincode})
+            res.send(products)
+        }else if(filter.crop){
+            console.log("crop")
+            const products = await Products.find({crop: filter.crop})
+            res.send(products)
+        }else if(filter.pincode){
+            console.log("pincode")
+            const products = await Products.find({pincode: filter.pincode})
+            res.send(products)
+        }else{
+            res.send({})
         }
-    })
+    }catch(e){
+        res.send({error: e})
+    }
+
 })
 
 module.exports = app;
