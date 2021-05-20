@@ -75,6 +75,8 @@ app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
         return images.buffer;
     })
 
+    // console.log("width",images.width)
+
     console.log("images",images)
 
     if(images.length === 0)
