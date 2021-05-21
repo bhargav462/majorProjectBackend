@@ -11,7 +11,7 @@ module.exports.register = async (message) => {
             return "Insufficient Arguments!"
         }
     
-        const number = message[0]
+        const number = Number.parseInt(message[0])
         const name = message[1] + message[2]
 
         var phonenoRegex = /^\d{10}$/;
