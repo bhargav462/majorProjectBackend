@@ -123,11 +123,10 @@ module.exports.addCrop = async (message,user) => {
 
         console.log("done3")
         
-        
+        const data = fs.readFileSync('./Utils/assets/nopreview.png')
 
-        await fs.readFile('./Utils/assets/nopreview.png',async (err,data) => {
-            console.log("error",err)
-            console.log("data",data)
+        // console.log("error",err)
+        console.log("data",data)
 
             const dataJson = {
                 buffer: data
@@ -152,7 +151,6 @@ module.exports.addCrop = async (message,user) => {
             console.log("product",product)
 
             return "Crop Added Successfully"
-        })
 
     }catch(e){
         console.log("error log",e)
@@ -170,7 +168,7 @@ module.exports.deleteCrop = () => {
 
 }
 
-//REGISTER
+// REGISTER
 // keyword number firstName secondName
 
 // ADD CROP

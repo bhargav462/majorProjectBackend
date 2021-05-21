@@ -191,7 +191,7 @@ router.post('/SMS/register',async(req,res) => {
            return res.send({error: "Invalid Mobile Number. Please Register"})
 
         if(mode === "addcrop"){
-           const response = smsUtil.addCrop(message,user)
+           const response = await smsUtil.addCrop(message,user)
            console.log("addCrop response",response)
            res.send(response)
         }else if(mode === "updateCrop"){
