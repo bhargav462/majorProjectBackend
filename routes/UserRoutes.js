@@ -6,6 +6,7 @@ const router = express.Router();
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const userTypes = require('./../Utils/UserTypes')
+const smsUtil = require('./../Utils/SMS/sms')
 
 router.post('/google/register',async (req,res) => {
     console.log("register",req.body)
@@ -146,30 +147,61 @@ router.post('/auth/login',async (req,res) => {
 
 router.post('/SMS/register',async(req,res) => {
 
-    console.log("/SMS/register",req.body)
+    console.log("/SMS/register",req.body.msg)
 
-    var msg = req.body.msg;
-    var index = msg.lastIndexOf(" ");
-    var name = msg.substring(0,index);
-    var mobile = msg.substring(index+1,msg.length)
-    var phoneno = /^\d{10}$/;
+    // var msg = req.body.msg;
+    // var index = msg.lastIndexOf(" ");
+    // var name = msg.substring(0,index);
+    // var mobile = msg.substring(index+1,msg.length)
+    // var phoneno = /^\d{10}$/;
 
-    if(mobile.match(phoneno)) {
-        let user = new SMSUser();
-        user.Name = name;
-        user.mobile = mobile;
+    // if(mobile.match(phoneno)) {
+    //     let user = new SMSUser();
+    //     user.Name = name;
+    //     user.mobile = mobile;
 
-        console.log()
+    //     console.log()
 
-        await user.save();
+    //     await user.save();
 
-        res.send({added: true});
-    }else {
-        console.log("mobile no. is not correct. Send message in proper format");
-        res.send({error: "mobile no. is not correct. Send message in proper format"})
+    //     res.send({added: true});
+    // }else {
+    //     console.log("mobile no. is not correct. Send message in proper format");
+    //     res.send({error: "mobile no. is not correct. Send message in proper format"})
+    // }
+
+    let message = req.body.msg.split(" ")
+    console.log(message.length)
+    if(message.length < 2){
+        return res.send({error: "Insufficient arguments"})
     }
-    
+    const mode = message.slice(0,1)[0].toLowerCase()
+    const number = message.slice(1,2)[0]
+    message = message.slice(1)
 
+    if(mode === "register"){
+      const response = await smsUtil.register(message)
+      console.log("register response",response)
+      res.send(response)
+    }else{
+       
+        const user = await SMSUser.findOne({mobile:number})
+        
+        if(!user)
+           return res.send({error: "Invalid Mobile Number. Please Register"})
+
+        if(mode === "addcrop"){
+           const response = smsUtil.addCrop(message,user)
+           console.log("addCrop response",response)
+           res.send(response)
+        }else if(mode === "updateCrop"){
+            smsUtil.updateCrop(message,user)
+        }else if(mode === "deleteCrop"){
+            smsUtil.deleteCrop(message,user)
+        }else{
+            res.send({error: "Incorrect arguments"})
+        }
+    }
 })
 
 // @desc Logout User

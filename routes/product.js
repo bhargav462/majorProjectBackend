@@ -10,6 +10,8 @@ const auth = require('./../middleware/auth')
 const multer = require('multer');
 const { FARMER, BUYER } = require('../Utils/UserTypes');
 const product = require('../models/product');
+const fs = require('fs');
+const SMSUser = require('../models/UserModels/SMSUser');
 
 const upload = multer();
 
@@ -49,7 +51,12 @@ app.post('/id',async(req,res) => {
            farmer = user
         }else{
             const googleUser = await GoogleUser.findById(product.farmerId)
+            if(googleUser)
             farmer = googleUser
+            else{
+                const smsUser = await SMSUser.findById(product.farmerId)
+                farmer = smsUser
+            }
         }
     }
     console.log("farner",farmer)
@@ -168,6 +175,6 @@ app.post('/filter',async (req,res) => {
         res.send({error: e})
     }
 
-})
+})  
 
 module.exports = app;

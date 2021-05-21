@@ -1,6 +1,7 @@
 const userTypes = {
     BUYER: 'BUYER',
-    FARMER: 'FARMER'
+    FARMER: 'FARMER',
+    SMS: 'SMS'
 };
 
 module.exports = userTypes;

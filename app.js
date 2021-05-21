@@ -32,6 +32,7 @@ app.get('/',(req,res) => {
 
 require('./models/product')
 app.use('/products', require('./routes/product'))
+app.use(require('./routes/news'))
 
 app.use(require('./routes/profile'))
 

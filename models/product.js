@@ -32,7 +32,10 @@ const productSchema = new mongoose.Schema({
     },
     images:[{
         type: Object    
-    }]
+    }],
+    number:{
+        type: Number
+    }
 });
 
 module.exports = mongoose.model('products', productSchema);
