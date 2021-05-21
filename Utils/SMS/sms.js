@@ -22,7 +22,8 @@ module.exports.register = async (message) => {
     
         const smsUser = new SMSUser({mobile: number, name})
         await smsUser.save()
-    
+        
+        sendSMS(number,"You are Registered Successfully")
         return "Registered Successfully"
     }catch(e){
         console.log("error",e)
@@ -30,6 +31,7 @@ module.exports.register = async (message) => {
             const user = await SMSUser.findOne({mobile: message[0]})
             console.log("user",user)
             if(user){
+                sendSMS(user.mobile,"Already Registered")
                 return "Already Registered"
             }
             return "Unexpected Error"
@@ -61,8 +63,11 @@ module.exports.addCrop = async (message,user) => {
         console.log("done1",message)
         
         if(message[0][0] != "/")
-        return "Invalid arguments. Error from description argument. Valid format is keyword number crop weight price /description/ /address/ pincode"
-        
+        {
+            sendSMS(number,"Invalid arguments. Error from description argument. Valid format is keyword number crop weight price /description/ /address/ pincode")
+            return "Invalid arguments. Error from description argument. Valid format is keyword number crop weight price /description/ /address/ pincode"
+        }
+
         message[0] = message[0].slice(1)
         let description = message[0]
 
@@ -90,8 +95,11 @@ module.exports.addCrop = async (message,user) => {
         console.log("done2",message)
         
         if(message[0][0] != "/")
-        return "Invalid arguments. Error from address argument. Valid format is keyword number crop weight price /description/ /address/ pincode"
-        
+        {
+            sendSMS(number,"Invalid arguments. Error from address argument. Valid format is keyword number crop weight price /description/ /address/ pincode")
+            return "Invalid arguments. Error from address argument. Valid format is keyword number crop weight price /description/ /address/ pincode"
+        }
+
         message[0] = message[0].slice(1)
         let address = message[0]
 
@@ -118,6 +126,7 @@ module.exports.addCrop = async (message,user) => {
         const pincode = message[index];
 
         if(!pincode.match(pincodeRegex)){
+            sendSMS(number,"Invalid Pincode. Valid format is keyword number crop weight price /description/ /address/ pincode")
             return "Invalid Pincode. Valid format is keyword number crop weight price /description/ /address/ pincode"
         }
 
@@ -149,7 +158,8 @@ module.exports.addCrop = async (message,user) => {
             await product.save()
 
             console.log("product",product)
-
+              
+            sendSMS(number,"Your crop was added successfully")
             return "Crop Added Successfully"
 
     }catch(e){
@@ -157,7 +167,7 @@ module.exports.addCrop = async (message,user) => {
         return "Invalid Arguments. Valid format is keyword number crop weight price /description/ /address/ pincode"
     }
 
-    return "Crop Added Successfully"
+    // return "Crop Added Successfully"
 }
 
 module.exports.updateCrop = () => {
@@ -166,6 +176,21 @@ module.exports.updateCrop = () => {
 
 module.exports.deleteCrop = () => {
  
+}
+
+const sendSMS = (number,body) => {
+    const accountSid = process.env.TWILIO_SID
+    const authToken = process.env.TWILIO_TOKEN
+
+    const client = require('twilio')(accountSid,authToken)
+
+    client.messages.create({
+        to: `+91${number}`,
+        from: '+19104691435',
+        body: body
+    }).then((message) => console.log("message",message))
+    .catch(error => console.log("error",error))
+
 }
 
 // REGISTER
