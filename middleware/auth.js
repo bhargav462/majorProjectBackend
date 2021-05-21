@@ -39,6 +39,6 @@ const auth = async(req,res,next) => {
         console.log('error',err.name);
         res.status(401).send({error:LOGIN});
     }
-}
+} 
 
 module.exports = auth;
