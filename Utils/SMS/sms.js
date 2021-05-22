@@ -3,7 +3,9 @@ const Products = require('./../../models/product')
 const sharp = require('sharp')
 const fs = require('fs')
 const { CustomerProfilesEntityAssignmentsPage } = require('twilio/lib/rest/trusthub/v1/customerProfiles/customerProfilesEntityAssignments')
-const token = require('./../../token')
+let token;
+if(process.env.NODE_ENV === "development")
+token = require('./../../token')
 
 module.exports.register = async (message) => {
     console.log("SMS Register",message)
@@ -308,6 +310,7 @@ module.exports.deleteCrop = async (message,user) => {
 const sendSMS = (number,body) => {
 
     console.log("body",body)
+    console.log("token",token)
 
     const accountSid = process.env.TWILIO_SID
     const authToken = process.env.TWILIO_TOKEN || token.token
