@@ -176,6 +176,7 @@ router.post('/SMS/register',async(req,res) => {
         return res.send({error: "Insufficient arguments"})
     }
     const mode = message.slice(0,1)[0].toLowerCase()
+    console.log("mode",mode)
     const number = message.slice(1,2)[0]
     message = message.slice(1)
 
@@ -194,10 +195,14 @@ router.post('/SMS/register',async(req,res) => {
            const response = await smsUtil.addCrop(message,user)
            console.log("addCrop response",response)
            res.send(response)
-        }else if(mode === "updateCrop"){
-            smsUtil.updateCrop(message,user)
-        }else if(mode === "deleteCrop"){
-            smsUtil.deleteCrop(message,user)
+        }else if(mode === "updatecrop"){
+            const response = await smsUtil.updateCrop(message,user)
+            console.log("updateCrop response",response)
+            res.send(response)
+        }else if(mode === "deletecrop"){
+            const response = await smsUtil.deleteCrop(message,user)
+            console.log("delete crop",response)
+            res.send(response)
         }else{
             res.send({error: "Incorrect arguments"})
         }

@@ -2,6 +2,8 @@ const SMSUser = require('./../../models/UserModels/SMSUser')
 const Products = require('./../../models/product')
 const sharp = require('sharp')
 const fs = require('fs')
+const { CustomerProfilesEntityAssignmentsPage } = require('twilio/lib/rest/trusthub/v1/customerProfiles/customerProfilesEntityAssignments')
+const token = require('./../../token')
 
 module.exports.register = async (message) => {
     console.log("SMS Register",message)
@@ -12,7 +14,7 @@ module.exports.register = async (message) => {
         }
     
         const number = message[0]
-        const name = message[1] + message[2]
+        const name = message[1] + " " + message[2]
 
         var phonenoRegex = /^\d{10}$/;
 
@@ -159,8 +161,8 @@ module.exports.addCrop = async (message,user) => {
 
             console.log("product",product)
               
-            sendSMS(number,"Your crop was added successfully")
-            return "Crop Added Successfully"
+            sendSMS(number,`Your crop was added successfully and your crop Id is ${product._id}`)
+            return `Crop Added Successfully ${product._id}`
 
     }catch(e){
         console.log("error log",e)
@@ -170,17 +172,147 @@ module.exports.addCrop = async (message,user) => {
     // return "Crop Added Successfully"
 }
 
-module.exports.updateCrop = () => {
+module.exports.updateCrop = async (message,user) => {
+
+    console.log("update",message)
+
+    try{
+       const number = message[0]
+       const cropId = message[1]
+       message = message.slice(2)
+
+       const product = await Products.findOne({_id: cropId, farmerId: user._id})
+
+       for(let i = 0; i < message.length; i++)
+       {
+           if(i+1 < message.length){        
+              
+              if(message[i] === "description"){
+                
+                console.log("in",message[i])
+                if(message[i+1][0] !== "/")
+                {
+                    sendSMS(number,"Error from description argument. Valid format is keyword number cropId weight weight price price description /description/ address /address/ pincode /pincode/. No need to add all the arguments. Please add the arguments only that you want to update")
+                    return "Invalid arguments. Error from address argument. Valid format is keyword number crop weight price /description/ /address/ pincode"
+                }
+                i++;
+                message[i] = message[i].slice(1)
+                let value = message[i]
+
+                if(message[i][message[i].length-1] !== "/")
+                {
+                    for(let m=i+1; m < message.length; m++){
+                        if(message[m][message[m].length-1] !== "/")
+                        value += " " + message[m]
+                        else{
+                            value += " " + message[m].substr(0,message[m].length-1)
+                            break;
+                        }
+                        i++;
+                        console.log("i",i)
+                    }
+                }else{
+                    value = value.substr(0,value.length-1)
+                }
+                i++;
+
+                product["description"] = value
+                await product.save()
+                
+                sendSMS(number,`Description was updated successfully for cropId ${product._id}`)
+                
+              }else if(message[i] === "address"){
+                
+                if(message[i+1][0] !== "/")
+                {
+                    sendSMS(number,"Error from address argument. Valid format is keyword number cropId weight weight price price description /description/ address /address/ pincode /pincode/. No need to add all the arguments. Please add the arguments only that you want to update")
+                    return "Invalid arguments. Error from address argument. Valid format is keyword number crop weight price /description/ /address/ pincode"
+                }
+                i++;
+                message[i] = message[i].slice(1)
+                let value = message[i]
+
+                if(message[i][message[i].length-1] !== "/")
+                {
+                    for(let m=i+1; m < message.length; m++){
+                        if(message[m][message[m].length-1] !== "/")
+                        value += " " + message[m]
+                        else{
+                            value += " " + message[m].substr(0,message[m].length-1)
+                            break;
+                        }
+                        i++;
+                    }
+                }else{
+                    value = value.substr(0,value.length-1)
+                }
+                i++;
+
+                product["address"] = value
+                await product.save()
+
+                sendSMS(number,`Address was updated successfully for cropId ${product._id}`)
+
+              }else{
+                  if((message[i] in product) === false){
+                    sendSMS(number,`Invalid ${message[i]} argument. Valid format is keyword number cropId weight weight price price description /description/ address /address/ pincode /pincode/. No need to add all the arguments. Please add the arguments only that you want to update`)
+                    return `Invalid ${message[i]} argument. Valid format is keyword number cropId weight weight price price description /description/ address /address/ pincode /pincode/. No need to add all the arguments. Please add the arguments only that you want to update`
+                  }
+
+                  product[message[i]] = message[i+1];
+                  await product.save()
+
+                  sendSMS(number,`${message[i]} was updated successfully for cropId ${product._id}`)
+
+                  i++;
+              }
+
+              console.log("product",product)
+              
+           }else{
+               return `Invalid argument: ${message[i]}`
+           }
+       }
+
+       return "Crop was Updated Successfully"
+
+    }catch(e){
+       console.log("error",e)
+       return "Unexpected Error"
+    }
 
 }
 
-module.exports.deleteCrop = () => {
- 
+module.exports.deleteCrop = async (message,user) => {
+
+    try{
+        if(message.length != 2)
+            return "Invalid Arguments"
+
+        const number = message[0]
+        const cropId = message[1]
+
+        const product = await Products.findOne({_id:cropId,farmerId:user._id})
+        await product.delete()
+
+        console.log("product",product)
+
+        return "Deleted Successfully"
+    }catch(e){
+        console.log("error",e)
+        return "Unexpected error"
+    }
+
 }
 
 const sendSMS = (number,body) => {
+
+    console.log("body",body)
+
     const accountSid = process.env.TWILIO_SID
-    const authToken = process.env.TWILIO_TOKEN
+    const authToken = process.env.TWILIO_TOKEN || token.token
+
+    console.log("authtoken",authToken)
 
     const client = require('twilio')(accountSid,authToken)
 
@@ -188,7 +320,7 @@ const sendSMS = (number,body) => {
         to: `+91${number}`,
         from: '+19104691435',
         body: body
-    }).then((message) => console.log("message",message))
+    }).then((message) => console.log("message"))
     .catch(error => console.log("error",error))
 
 }
@@ -209,3 +341,4 @@ const sendSMS = (number,body) => {
 
 // DELETE CROP
 // keyword number cropId
+
