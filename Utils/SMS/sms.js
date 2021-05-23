@@ -298,12 +298,36 @@ module.exports.deleteCrop = async (message,user) => {
         await product.delete()
 
         console.log("product",product)
-
+        
+        sendSMS(number,`Your crop ${product._id} was deleted successfully`)
         return "Deleted Successfully"
     }catch(e){
         console.log("error",e)
         return "Unexpected error"
     }
+
+}
+
+module.exports.cropData = async (message,user) => {
+    const number = message[0]
+    const cropName = message[1]
+
+    console.log("message",message)
+
+    let data = fs.readFileSync('./Utils/news.json')
+
+    data = JSON.parse(data)
+    console.log("data",data[0])
+
+    for(let i = 0; i < data.length; i++)
+    {
+        if(data[i].commodity.toLowerCase() === cropName.trim().toLowerCase()){
+            sendSMS(number,`Modal price of ${cropName} is ${data[i].modal_price}`)
+            return data[i].modal_price
+        }
+    }
+
+    return "Data not found"
 
 }
 
@@ -344,4 +368,7 @@ const sendSMS = (number,body) => {
 
 // DELETE CROP
 // keyword number cropId
+
+// CROP NEWS
+// keyword number cropName
 

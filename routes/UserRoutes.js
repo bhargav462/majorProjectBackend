@@ -203,6 +203,10 @@ router.post('/SMS/register',async(req,res) => {
             const response = await smsUtil.deleteCrop(message,user)
             console.log("delete crop",response)
             res.send(response)
+        }else if(mode === "cropnews"){
+            const response = await smsUtil.cropData(message,user)
+            console.log("Crop Data",response)
+            res.send(response)
         }else{
             res.send({error: "Incorrect arguments"})
         }
