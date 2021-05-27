@@ -257,6 +257,7 @@ module.exports.updateCrop = async (message,user) => {
 
               }else{
                   if((message[i] in product) === false){
+                      console.log("check",message[i]);  
                     sendSMS(number,`Invalid ${message[i]} argument. Valid format is keyword number cropId weight weight price price description /description/ address /address/ pincode /pincode/. No need to add all the arguments. Please add the arguments only that you want to update`)
                     return `Invalid ${message[i]} argument. Valid format is keyword number cropId weight weight price price description /description/ address /address/ pincode /pincode/. No need to add all the arguments. Please add the arguments only that you want to update`
                   }
@@ -309,6 +310,9 @@ module.exports.deleteCrop = async (message,user) => {
 }
 
 module.exports.cropData = async (message,user) => {
+
+    console.log("Inside CropData",message);
+
     const number = message[0]
     const cropName = message[1]
 
