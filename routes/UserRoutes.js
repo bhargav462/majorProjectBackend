@@ -6,7 +6,8 @@ const router = express.Router();
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const userTypes = require('./../Utils/UserTypes')
-const smsUtil = require('./../Utils/SMS/sms')
+const smsUtil = require('./../Utils/SMS/sms');
+const { SMS } = require('./../Utils/UserTypes');
 
 router.post('/google/register',async (req,res) => {
     console.log("register",req.body)
@@ -219,6 +220,21 @@ router.post('/SMS/register',async(req,res) => {
 router.get('/logout',(req,res) => {
     req.logout()
     res.redirect(`${process.env.REACT_URL}/login`)
+})
+
+router.post('/users/count',async (req,res) => {
+    const count = {};
+    count.Farmers = await GoogleUser.count({type: userTypes.FARMER})
+    count.Farmers += await User.count({type: userTypes.FARMER})
+    count.Farmers += await SMSUser.count({});
+
+    count.Buyers = await GoogleUser.count({type: userTypes.BUYER})
+    count.Buyers += await User.count({type: userTypes.BUYER})
+
+    console.log("count",count);
+
+    res.send(count);
+
 })
 
 module.exports = router;
