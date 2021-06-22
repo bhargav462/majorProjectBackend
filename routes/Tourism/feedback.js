@@ -12,7 +12,7 @@ router.post('/form',async (req,res) => {
         feedback.feedback = req.body.feedback
         console.log("feedback",feedback)
         await feedback.save()
-        res.send();
+        res.send({});
     }catch(e){
         res.send({error:e})
     }
