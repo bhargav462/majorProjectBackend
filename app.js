@@ -34,6 +34,9 @@ require('./models/product')
 app.use('/products', require('./routes/product'))
 app.use(require('./routes/news'))
 
+//It is not a part of this project
+app.use('/feedback',require('./routes/Tourism/feedback'))
+
 app.use(require('./routes/profile'))
 
 app.listen(PORT,() => {
