@@ -7,7 +7,7 @@ router.post('/form',async (req,res) => {
     try{
         const {name,place} = req.body
         const feedback = new Feedback();
-        feedback.Name = name
+        feedback.name = name
         feedback.place = place
         feedback.feedback = req.body.feedback
         console.log("feedback",feedback)
