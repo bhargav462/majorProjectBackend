@@ -25,4 +25,4 @@ router.get('/get',async (req,res) => {
     }
 })
 
-module.exports = Feedback
+module.exports = router
