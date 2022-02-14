@@ -1,0 +1,70 @@
+[
+    {
+      "crop": "Apple",
+      "image": "/assets/apple.png"
+    },
+    {
+        "crop": "Banana",
+        "image": "/assets/banana.png"
+    },
+    {
+        "crop": "Brinjal",
+        "image": "/assets/brinjal.png"
+    },
+    {
+        "crop": "Capsicum",
+        "image": "/assets/capsicum.png"
+    },
+    {
+        "crop": "Carrot",
+        "image": "/assets/carrot.png"
+    },
+    {
+        "crop": "Coconut",
+        "image": "/assets/coconut.png"
+    },
+    {
+        "crop": "Grapes",
+        "image": "/assets/grapes.png"
+    },
+    {
+        "crop": "Guava",
+        "image": "/assets/guava.png"
+    },
+    {
+        "crop": "Lemon",
+        "image": "/assets/lemon.png"
+    },
+    {
+        "crop": "Mango",
+        "image": "/assets/mango.png"
+    },
+    {
+        "crop": "Onion",
+        "image": "/assets/onion.png"
+    },
+    {
+        "crop": "Peanuts",
+        "image": "/assets/peanuts.png"
+    },
+    {
+        "crop": "Peas",
+        "image": "/assets/peas.png"
+    },
+    {
+        "crop": "Pomegranate",
+        "image": "/assets/pomegranate.png"
+    },
+    {
+        "crop": "Spinach",
+        "image": "/assets/spinach.png"
+    },
+    {
+        "crop": "Strawberry",
+        "image": "/assets/strawberry.png"
+    },
+    {
+        "crop": "Tomato",
+        "image": "/assets/tomato.png"
+    }
+]

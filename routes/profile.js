@@ -6,7 +6,7 @@ const Products = require('./../models/product')
 const auth = require('./../middleware/auth');
 const { BUYER, FARMER } = require('../Utils/UserTypes');
 
-router.post('/profile',auth, async (req,res) => {
+router.get('/profile',auth, async (req,res) => {
     const profile = await User.findOne({_id:req.user.id});
     const googleProfile = await GoogleUser.findOne({_id: req.user.id})
     let user;

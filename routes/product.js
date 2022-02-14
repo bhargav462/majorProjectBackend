@@ -12,13 +12,51 @@ const { FARMER, BUYER } = require('../Utils/UserTypes');
 const product = require('../models/product');
 const fs = require('fs');
 const SMSUser = require('../models/UserModels/SMSUser');
+const { result } = require('lodash');
 
 const upload = multer();
 
-app.post('/crops', async (req,res) => {
-    const products = await Products.find();
-    console.log('all crops',products)
-    res.json(products);
+app.get('/crops', async (req,res) => {
+    const pageNumber = parseInt(req.query.pageNumber)
+    const pageSize = parseInt(req.query.pageSize)
+    
+    const startIndex = (pageNumber - 1) * pageSize;
+    const endIndex = pageNumber * pageSize;
+
+    const results = {}
+    results.totalCount = await Products.countDocuments().exec()
+    results.totalPages = Math.ceil(results.totalCount/pageSize);
+
+    if(endIndex < results.totalCount){
+        results.next = {
+            nextPage: pageNumber + 1,
+            pageSize
+        }
+    }
+
+    if(startIndex > 0){
+        results.previous = {
+            previousPage: pageNumber - 1,
+            pageSize
+        }
+    }
+    
+    const products = await Products.find().limit(pageSize).skip(startIndex);
+    results.products = products
+
+    res.json(results);
+})
+
+app.get('/cropNames',async(req,res) => {
+    fs.readFile('./Utils/productList.json',(err,data) => {
+        if(err){
+            console.log("error",err)
+            res.send({error: err})
+        }
+        data = JSON.parse(data)
+
+        res.send(data)
+    })
 })
 
 app.get('/:cropName',auth,async(req,res) => {
@@ -74,41 +112,49 @@ app.post('/farmer/addCrop',auth, upload.array('images'),async (req,res) => {
     }
     else {
 
-    console.log("body",req.body)
-    console.log("user",req.user)
-    console.log(req.files)
+        console.log("body",req.body)
+        console.log("user",req.user)
+        console.log(req.files)
 
-    let images = req.files.filter(images => {
-        return images.buffer;
-    })
+        fs.readFile('./Utils/productList.json',async (err,data) => {
+            if(err){
+                console.log("error",err)
+                res.send({error: err})
+            }
+            data = JSON.parse(data)
 
-    // console.log("width",images.width)
+            const crops = data.filter(crop => crop.crop === req.body.cropName)
+            const images = crops.map(crop => crop.image)
 
-    console.log("images",images)
+            console.log("images",images)
 
-    if(images.length === 0)
-    return res.send({error:"images are required"})
+            if(images.length === 0)
+            return res.send({error:"images are required"})
 
-    await new Products({
-        farmerId: req.user.id,
-        crop: req.body.cropName,
-        address: req.body.address,
-        price: req.body.price,
-        amount: req.body.weight,
-        description: req.body.description,
-        pincode: req.body.pincode,
-        images : images
-    }).save((err,data) => {
-        if(err) {
-            console.log("err -- /products/addCrop",err)
-            res.send({error:err})
-        }
-        else{   
-            res.send({id:data._id})
-        }
-    })
+            await new Products({
+                farmerId: req.user.id,
+                crop: req.body.cropName,
+                address: req.body.address,
+                price: req.body.price,
+                amount: req.body.weight,
+                description: req.body.description,
+                pincode: req.body.pincode,
+                images : images
+            }).save((err,data) => {
+                if(err) {
+                    console.log("err -- /products/addCrop",err)
+                    res.send({error:err})
+                }
+                else{   
+                    res.send({id:data._id})
+                }
+            })
+    
+        })
 
-}
+        // console.log("width",images.width)
+
+    }
 })
 
 app.post('/farmer/updateCrop',auth,async(req,res) => {
