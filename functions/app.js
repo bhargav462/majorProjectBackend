@@ -28,6 +28,11 @@ app.get('/',(req,res) => {
     res.send('<h1>You can get / route</h1>')
 })
 
+app.get('/.netlify/functions/api',(req,res) => {
+    console.log('deployed successfully')
+    res.send('<h1>You can get /netlify route</h1>')
+})
+
 require('../models/product')
 app.use('/products', require('../routes/product'))
 app.use(require('../routes/news'))
