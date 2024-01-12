@@ -23,10 +23,10 @@ app.use(bodyParser.json());
 app.use(require('../routes/UserRoutes'))
 app.use(express.static(path.join(__dirname,'public')))
 
-const router = Router();
-router.get("/hello", (req, res) => res.send("Hello World!"));
+// const router = Router();
+// router.get("/hello", (req, res) => res.send("Hello World!"));
 
-api.use("/api/", router);
+// api.use("/api/", router);
 
 app.get('/',(req,res) => {
     console.log('deployed successfully')
