@@ -1,12 +1,13 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const connectDB = require('./config/db');
 const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const path = require('path')
+const serverless = require('serverless-http')
 
+const connectDB = require('../config/db');
 dotenv.config({path:'./config/config.env'})
 
 const PORT = process.env.PORT || 5000;
@@ -24,7 +25,7 @@ if(process.env.NODE_ENV === 'development'){
 
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json());
-app.use(require('./routes/UserRoutes'))
+app.use(require('../routes/UserRoutes'))
 app.use(express.static(path.join(__dirname,'public')))
 
 app.get('/',(req,res) => {
@@ -32,19 +33,20 @@ app.get('/',(req,res) => {
     res.send('<h1>You can get / route</h1>')
 })
 
-require('./models/product')
-app.use('/products', require('./routes/product'))
-app.use(require('./routes/news'))
+require('../models/product')
+app.use('/products', require('../routes/product'))
+app.use(require('../routes/news'))
 
 //It is not a part of this project
-app.use('/feedback',require('./routes/Tourism/feedback'))
+app.use('/feedback',require('../routes/Tourism/feedback'))
 
-app.use(require('./routes/profile'))
+app.use(require('../routes/profile'))
 
 app.listen(PORT,() => {
     console.log(`Server running in ${process.env.NODE_ENV} made on port ${PORT}`);
 })
 
+module.exports.handler = serverless(app);
 
 
 
