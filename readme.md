@@ -1,1 +1,1 @@
-node version: v10.24.1
+node version: v18.17.1
