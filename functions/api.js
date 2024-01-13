@@ -48,14 +48,16 @@ app.use(`/.netlify/functions/api`, router);
 app.get('/.netlify/functions/api/assets/:imageId', function (req, res) {
     const imagePath = path.join(__dirname, '../public/assets', req.params.imageId);
 
-    if (fs.existsSync(imagePath)) {
-        // Read the image file and send it as a response
-        fs.createReadStream(imagePath).pipe(res);
-      } else {
-        // Image not found
-        res.statusCode = 404;
-        res.end('Not Found');
-      }
+    // if (fs.existsSync(imagePath)) {
+    //     // Read the image file and send it as a response
+    //     fs.createReadStream(imagePath).pipe(res);
+    //   } else {
+    //     // Image not found
+    //     res.statusCode = 404;
+    //     res.end('Not Found');
+    //   }
+
+    res.send('umage')
 });
 
 app.listen(PORT,() => {
