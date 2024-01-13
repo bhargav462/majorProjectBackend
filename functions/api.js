@@ -21,7 +21,8 @@ app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname,'../public')))
+
+app.use('/.netlify/functions/api', express.static(path.join(__dirname, '../public')));
 
 const router = express.Router();
 
@@ -45,20 +46,6 @@ router.use(require('../routes/profile'))
 
 app.use(`/.netlify/functions/api`, router);
 
-app.get('/.netlify/functions/api/assets/:imageId', function (req, res) {
-    const imagePath = path.join(__dirname, '../public/assets', req.params.imageId);
-
-    // if (fs.existsSync(imagePath)) {
-    //     // Read the image file and send it as a response
-    //     fs.createReadStream(imagePath).pipe(res);
-    //   } else {
-    //     // Image not found
-    //     res.statusCode = 404;
-    //     res.end('Not Found');
-    //   }
-
-    res.send('umage')
-});
 
 app.listen(PORT,() => {
     console.log(`Server running in ${process.env.NODE_ENV} made on port ${PORT}`);
