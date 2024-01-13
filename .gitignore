@@ -3,4 +3,4 @@ request.rest
 .vscode
 # Local Netlify folder
 .netlify
-config
+config.env
