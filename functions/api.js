@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const path = require('path')
 const serverless = require('serverless-http')
+const fs = require('fs')
 
 const connectDB = require('../config/db');
 dotenv.config({path:'./config/config.env'})
@@ -45,17 +46,16 @@ router.use(require('../routes/profile'))
 app.use(`/.netlify/functions/api`, router);
 
 app.get('/.netlify/functions/api/assets/:imageId', function (req, res) {
-    const options = {
-        root: path.join(path.join(__dirname,'../public/assets'))
-    };
- 
-    res.sendFile(req.params.imageId, options, function (err) {
-        if (err) {
-            console.error('Error sending file:', err);
-        } else {
-            console.log('Sent:', req.query.imageId);
-        }
-    });
+    const imagePath = path.join(__dirname, '../public/assets', req.params.imageId);
+
+    if (fs.existsSync(imagePath)) {
+        // Read the image file and send it as a response
+        fs.createReadStream(imagePath).pipe(res);
+      } else {
+        // Image not found
+        res.statusCode = 404;
+        res.end('Not Found');
+      }
 });
 
 app.listen(PORT,() => {
