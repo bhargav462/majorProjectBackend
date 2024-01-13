@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json());
 app.use(require('../routes/UserRoutes'))
-app.use(express.static(path.join(__dirname,'public')))
+app.use(express.static(path.join(__dirname,'../public')))
 
 // const router = Router();
 // router.get("/hello", (req, res) => res.send("Hello World!"));

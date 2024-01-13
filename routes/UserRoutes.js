@@ -224,12 +224,15 @@ router.get('/logout',(req,res) => {
 
 router.post('/users/count',async (req,res) => {
     const count = {};
-    count.Farmers = await GoogleUser.count({type: userTypes.FARMER})
-    count.Farmers += await User.count({type: userTypes.FARMER})
-    count.Farmers += await SMSUser.count({});
+    const test = await GoogleUser.find({ 
+        type: userTypes.FARMER
+    })
+    count.Farmers = await GoogleUser.countDocuments({type: userTypes.FARMER})
+    count.Farmers += await User.countDocuments({type: userTypes.FARMER})
+    count.Farmers += await SMSUser.countDocuments({});
 
-    count.Buyers = await GoogleUser.count({type: userTypes.BUYER})
-    count.Buyers += await User.count({type: userTypes.BUYER})
+    count.Buyers = await GoogleUser.countDocuments({type: userTypes.BUYER})
+    count.Buyers += await User.countDocuments({type: userTypes.BUYER})
 
     console.log("count",count);
 
