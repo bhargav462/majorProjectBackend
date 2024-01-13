@@ -20,32 +20,43 @@ app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json());
-app.use(require('../routes/UserRoutes'))
 app.use(express.static(path.join(__dirname,'../public')))
 
-// const router = Router();
-// router.get("/hello", (req, res) => res.send("Hello World!"));
+const router = express.Router();
 
-// api.use("/api/", router);
+router.use(require('../routes/UserRoutes'))
 
-app.get('/',(req,res) => {
+
+router.get('/',(req,res) => {
     console.log('deployed successfully')
     res.send('<h1>You can get / route</h1>')
 })
 
-app.get('/.netlify/functions/api',(req,res) => {
-    console.log('deployed successfully')
-    res.send('<h1>You can get /netlify route</h1>')
-})
 
 require('../models/product')
-app.use('/products', require('../routes/product'))
-app.use(require('../routes/news'))
+router.use('/products', require('../routes/product'))
+router.use(require('../routes/news'))
 
 //It is not a part of this project
-app.use('/feedback',require('../routes/Tourism/feedback'))
+router.use('/feedback',require('../routes/Tourism/feedback'))
 
-app.use(require('../routes/profile'))
+router.use(require('../routes/profile'))
+
+app.use(`/.netlify/functions/api`, router);
+
+app.get('/.netlify/functions/api/assets/:imageId', function (req, res) {
+    const options = {
+        root: path.join(path.join(__dirname,'../public/assets'))
+    };
+ 
+    res.sendFile(req.params.imageId, options, function (err) {
+        if (err) {
+            console.error('Error sending file:', err);
+        } else {
+            console.log('Sent:', req.query.imageId);
+        }
+    });
+});
 
 app.listen(PORT,() => {
     console.log(`Server running in ${process.env.NODE_ENV} made on port ${PORT}`);
